@@ -19,6 +19,7 @@ RUN luet install -y \
     system/grub2-efi-image \
     system/grub2-artifacts \
     selinux/k3s \
+    toolchain/elemental-cli \
     toolchain/yq \
     toolchain/yip \
     toolchain/luet
@@ -41,8 +42,8 @@ RUN mkdir /usr/libexec && touch /usr/libexec/.keep
 # Copy custom files
 COPY files/ /
 
-# Generate initrd
-RUN mkinitrd
+# Generate initrd with required elemental services
+RUN dracut -f --regenerate-all
 
 # OS level configuration
 RUN echo "VERSION=6666" > /etc/os-release
