@@ -1,0 +1,15 @@
+iso:
+  uefi:
+    - channel:live/grub2-efi-image
+  image:
+    - channel:live/grub2
+    - channel:live/grub2-efi-image
+  label: "COS_LIVE"
+
+name: "k3cos-0"
+date: true
+
+repositories:
+  - uri: quay.io/costoolkit/releases-teal
+    type: docker
+    reference: v0.10.6-repository.yaml
