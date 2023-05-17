@@ -78,9 +78,17 @@ stages:
           /var/lib/longhorn
           /var/lib/cni
         PERSISTENT_STATE_BIND: "true"
-   # Finally, let's start k3s when network is available, and download the SSH key from github for the niusmallnan user
+   # Finally, let's start k3s when network is available
    network:
-     - name: "Start k3s"
+     - if: '[ ! -f "/run/cos/recovery_mode" ]'
+       name: "Setup k3s"
+       # Setup environment file for custom k3s arguments
+       environment_file: "/etc/systemd/system/k3s.service.env"
+       environment:
+         CATTLE_NEW_SIGNED_CERT_EXPIRATION_DAYS: "3650"
        systemctl:
          start:
          - k3s
+     - commands:
+       - |
+                chmod 600 /etc/systemd/system/k3s.service.env
