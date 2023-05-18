@@ -1,0 +1,50 @@
+#!/bin/bash
+
+TARGET=/run/cos/target
+mkdir -p ${TARGET}
+
+
+umount_target()
+{
+    sync
+    umount ${TARGET}/usr/local
+}
+
+do_mount()
+{
+    PERSISTENT=$(blkid -L COS_PERSISTENT || true)
+    mkdir -p ${TARGET}/usr/local
+    mount ${PERSISTENT} ${TARGET}/usr/local
+}
+
+do_preload()
+{
+    # Bind mount persistent folder to preload images
+    BIND_MOUNTS=("var/lib/rancher")
+
+    for i in ${BIND_MOUNTS[@]}; do
+        state_dir="/usr/local/.state/${i//\//-}.bind"
+        mkdir -p $TARGET/$i
+        mkdir -p $TARGET/$state_dir
+        mount -o bind $TARGET/$state_dir $TARGET/$i
+    done
+
+    K3S_AIRGAP_SOURCE=/opt/k3s/k3s-airgap-images-amd64.tar.zst
+    K3S_AIRGAP_TARGET_DIR=${TARGET}/var/lib/rancher/k3s/agent/images
+    mkdir -p ${K3S_AIRGAP_TARGET_DIR}
+    zstd -d ${K3S_AIRGAP_SOURCE} -o ${K3S_AIRGAP_TARGET_DIR}/k3s-airgap-images-amd64.tar
+
+    for i in ${BIND_MOUNTS[@]}; do
+        umount $TARGET/$i
+    done
+}
+
+elemental install /dev/sda
+
+do_mount
+do_preload
+umount_target
+
+echo " * Rebooting system in 5 seconds (CTRL+C to cancel)"
+sleep 5
+reboot -f

@@ -27,8 +27,10 @@ RUN luet install -y \
 # Install k3s server/agent
 ENV INSTALL_K3S_VERSION=${K3S_VERSION}
 RUN curl -sfL https://get.k3s.io > installer.sh && \
-    INSTALL_K3S_SKIP_START="true" INSTALL_K3S_SKIP_ENABLE="true" sh installer.sh && \
-    INSTALL_K3S_SKIP_START="true" INSTALL_K3S_SKIP_ENABLE="true" sh installer.sh agent && \
+    INSTALL_K3S_SKIP_START="true" INSTALL_K3S_SKIP_ENABLE="true" INSTALL_K3S_BIN_DIR="/usr/bin" sh installer.sh && \
+    INSTALL_K3S_SKIP_START="true" INSTALL_K3S_SKIP_ENABLE="true" INSTALL_K3S_BIN_DIR="/usr/bin" sh installer.sh agent && \
+    mkdir -p /opt/k3s && \
+    curl -sfL https://github.com/k3s-io/k3s/releases/download/${INSTALL_K3S_VERSION}/k3s-airgap-images-amd64.tar.zst > /opt/k3s/k3s-airgap-images-amd64.tar.zst && \
     rm -rf installer.sh
 
 ## System layout
@@ -51,7 +53,7 @@ RUN echo "GRUB_ENTRY_NAME=K3COS" >> /etc/os-release
 RUN echo "welcome to our K3COS" >> /etc/issue.d/01-k3cos
 
 # Download nerdctl
-ARG NERDCTL_VERSION=1.2.1
+ARG NERDCTL_VERSION=1.3.1
 RUN curl -o ./nerdctl-bin.tar.gz -sfL "https://github.com/containerd/nerdctl/releases/download/v${NERDCTL_VERSION}/nerdctl-${NERDCTL_VERSION}-linux-amd64.tar.gz"
 RUN tar -zxvf nerdctl-bin.tar.gz && mv nerdctl /usr/bin/
 RUN rm -f nerdctl-bin.tar.gz containerd-rootless-setuptool.sh containerd-rootless.sh
