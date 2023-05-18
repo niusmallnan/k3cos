@@ -57,10 +57,14 @@ function start {
 
   case "${base_disk}" in
       *.qcow2)
-        qemu-img create -f qcow2 -b "${base_disk}" -F qcow2 "${ELMNTL_TESTDISK}" > /dev/null
+        if [ ! -f "${ELMNTL_TESTDISK}" ]; then
+            qemu-img create -f qcow2 -b "${base_disk}" -F qcow2 "${ELMNTL_TESTDISK}" > /dev/null
+        fi
         ;;
       *.iso)
-        qemu-img create -f qcow2 "${ELMNTL_TESTDISK}" "${ELMNTL_DISKSIZE}" > /dev/null
+        if [ ! -f "${ELMNTL_TESTDISK}" ]; then
+            qemu-img create -f qcow2 "${ELMNTL_TESTDISK}" "${ELMNTL_DISKSIZE}" > /dev/null
+        fi
         cdrom_arg="-cdrom ${base_disk}"
         ;;
       *)

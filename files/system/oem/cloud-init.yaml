@@ -80,7 +80,7 @@ stages:
         PERSISTENT_STATE_BIND: "true"
    # Finally, let's start k3s when network is available
    network:
-     - if: '[ ! -f "/run/cos/recovery_mode" ]'
+     - if: '[ $(blkid -L COS_STATE) ]'
        name: "Setup k3s"
        # Setup environment file for custom k3s arguments
        environment_file: "/etc/systemd/system/k3s.service.env"
@@ -91,4 +91,4 @@ stages:
          - k3s
      - commands:
        - |
-                chmod 600 /etc/systemd/system/k3s.service.env
+           chmod 600 /etc/systemd/system/k3s.service.env
