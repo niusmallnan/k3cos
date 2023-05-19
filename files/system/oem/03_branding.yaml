@@ -1,0 +1,6 @@
+name: "Branding"
+stages:
+  initramfs:
+  # Setup default hostname
+  - name: "Branding"
+    hostname: "k3cos"

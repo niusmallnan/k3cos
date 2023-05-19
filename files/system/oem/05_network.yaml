@@ -1,0 +1,37 @@
+name: "Network settings"
+stages:
+  initramfs:
+  # Setup network - openSUSE specific
+  - name: "Network setup"
+    files:
+    - path: /etc/sysconfig/network/ifcfg-eth0
+      content: |
+        BOOTPROTO='dhcp'
+        STARTMODE='onboot'
+      permissions: 0600
+      owner: 0
+      group: 0
+  # Finally, let's start k3s when network is available
+  network.before:
+  - if: '[ $(blkid -L COS_STATE) ]'
+    name: "Setup k3s"
+    files:
+    - path: /etc/default/k3s
+      content: |
+        CATTLE_NEW_SIGNED_CERT_EXPIRATION_DAYS=3650
+        K3S_KUBECONFIG_MODE=644
+      permissions: 0600
+      owner: 0
+      group: 0
+    - path: /etc/default/k3s-agent
+      content: |
+        CATTLE_NEW_SIGNED_CERT_EXPIRATION_DAYS=3650
+      permissions: 0600
+      owner: 0
+      group: 0
+  network:
+  - if: '[ $(blkid -L COS_STATE) ]'
+    name: "Start k3s"
+    systemctl:
+      start:
+      - k3s

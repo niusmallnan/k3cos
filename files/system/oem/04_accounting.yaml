@@ -1,0 +1,41 @@
+name: "Default user"
+stages:
+  initramfs:
+  # Setup an admin group with sudo access
+  - name: "Setup groups"
+    ensure_entities:
+    - entity: |
+        kind: "group"
+        group_name: "admin"
+        password: "x"
+        gid: 900
+     # Setup a custom user
+  - name: "Setup users"
+    users:
+    # Replace the default user name here and settings
+      niusmallnan:
+        # Comment passwd for no password
+        # python3 -c "import crypt; print(crypt.crypt('dagedddd', crypt.METHOD_SHA256))"
+        passwd: "$5$Aw2jRX9G5vxlcozy$4QIBR2LiZE7yOwC85PE9ZNu4TiHxzw9pxa1/IsxKYWC"
+        shell: /bin/bash
+        homedir: "/home/niusmallnan"
+        groups:
+        - "admin"
+  # Setup sudo
+  - name: "Setup sudo"
+    files:
+    - path: "/etc/sudoers"
+      owner: 0
+      group: 0
+      permsisions: 0600
+      content: |
+        Defaults always_set_home
+        Defaults secure_path="/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin:/usr/local/sbin"
+        Defaults env_reset
+        Defaults env_keep = "LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_ATIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE"
+        Defaults !insults
+        root ALL=(ALL) ALL
+        %admin ALL=(ALL) NOPASSWD: ALL
+        @includedir /etc/sudoers.d
+    commands:
+    - passwd -l root
