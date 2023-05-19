@@ -14,7 +14,7 @@ mkdir -p $TESTS_PATH
 : "${ELMNTL_FIRMWARE:=/usr/share/ovmf/OVMF.fd}"
 : "${ELMNTL_FWDIP:=127.0.0.1}"
 : "${ELMNTL_FWDPORT:=2222}"
-: "${ELMNTL_MEMORY:=2048}"
+: "${ELMNTL_MEMORY:=4096}"
 : "${ELMNTL_LOGFILE:=${TESTS_PATH}/serial.log}"
 : "${ELMNTL_PIDFILE:=${TESTS_PATH}/testvm.pid}"
 : "${ELMNTL_TESTDISK:=${TESTS_PATH}/testdisk.qcow2}"
@@ -22,6 +22,7 @@ mkdir -p $TESTS_PATH
 : "${ELMNTL_DISPLAY:=none}"
 : "${ELMNTL_ACCEL:=kvm}"
 : "${ELMNTL_KUBE_EXPLORER_FWD:=hostfwd=tcp::9898-:9898}"
+: "${ELMNTL_SMP:=2}"
 
 function _abort {
     echo "$@" && exit 1
@@ -42,6 +43,7 @@ function start {
   local cdrom_arg
   local cpu_arg="-cpu max"
   local vmpid
+  local smp_arg="-smp ${ELMNTL_SMP}"
 
   [ -f "${base_disk}" ] || _abort "Disk not found: ${base_disk}"
 
@@ -79,7 +81,7 @@ function start {
 
   qemu-system-x86_64 ${disk_arg} ${cdrom_arg} ${firmware_arg} ${usrnet_arg} \
       ${kvm_arg} ${memory_arg} ${graphics_arg} ${serial_arg} ${pidfile_arg} \
-      ${daemon_arg} ${display_arg} ${machine_arg} ${accel_arg} ${cpu_arg}
+      ${daemon_arg} ${display_arg} ${machine_arg} ${accel_arg} ${cpu_arg} ${smp_arg}
 }
 
 function stop {
