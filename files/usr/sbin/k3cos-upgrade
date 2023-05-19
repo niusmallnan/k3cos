@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Not completed...
+#
+#
+set -e -x
+source /etc/os-release
+
+elemental upgrade --system.uri docker:niusmallnan/k3cos:$1
+echo " * Rebooting system in 5 seconds (CTRL+C to cancel)"
+sleep 5
+reboot -f
