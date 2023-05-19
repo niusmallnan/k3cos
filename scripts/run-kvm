@@ -21,6 +21,7 @@ mkdir -p $TESTS_PATH
 : "${ELMNTL_DISKSIZE:=30G}"
 : "${ELMNTL_DISPLAY:=none}"
 : "${ELMNTL_ACCEL:=kvm}"
+: "${ELMNTL_KUBE_EXPLORER_FWD:=hostfwd=tcp::9898-:9898}"
 
 function _abort {
     echo "$@" && exit 1
@@ -28,7 +29,7 @@ function _abort {
 
 function start {
   local base_disk=$1
-  local usrnet_arg="-netdev user,id=user0,hostfwd=tcp:${ELMNTL_FWDIP}:${ELMNTL_FWDPORT}-:22 -device virtio-net-pci,netdev=user0"
+  local usrnet_arg="-netdev user,id=user0,hostfwd=tcp:${ELMNTL_FWDIP}:${ELMNTL_FWDPORT}-:22,${ELMNTL_KUBE_EXPLORER_FWD} -device virtio-net-pci,netdev=user0"
   local accel_arg
   local memory_arg="-m ${ELMNTL_MEMORY}"
   local firmware_arg="-bios ${ELMNTL_FIRMWARE} -drive if=pflash,format=raw,readonly=on,file=${ELMNTL_FIRMWARE}"

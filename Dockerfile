@@ -48,12 +48,17 @@ COPY files/ /
 RUN dracut -f --regenerate-all
 
 # OS level configuration
-RUN echo "VERSION=6666" > /etc/os-release
-RUN echo "GRUB_ENTRY_NAME=K3COS" >> /etc/os-release
-RUN echo "welcome to our K3COS" >> /etc/issue.d/01-k3cos
+RUN echo "VERSION=6666" > /etc/os-release && \
+    echo "GRUB_ENTRY_NAME=K3COS" >> /etc/os-release && \
+    echo "Welcome to our K3COS" >> /etc/issue.d/01-k3cos
 
-# Download nerdctl
+# Add nerdctl
 ARG NERDCTL_VERSION=1.3.1
-RUN curl -o ./nerdctl-bin.tar.gz -sfL "https://github.com/containerd/nerdctl/releases/download/v${NERDCTL_VERSION}/nerdctl-${NERDCTL_VERSION}-linux-amd64.tar.gz"
-RUN tar -zxvf nerdctl-bin.tar.gz && mv nerdctl /usr/bin/
-RUN rm -f nerdctl-bin.tar.gz containerd-rootless-setuptool.sh containerd-rootless.sh
+RUN curl -o ./nerdctl-bin.tar.gz -sfL "https://github.com/containerd/nerdctl/releases/download/v${NERDCTL_VERSION}/nerdctl-${NERDCTL_VERSION}-linux-amd64.tar.gz" && \
+    tar -zxvf nerdctl-bin.tar.gz && mv nerdctl /usr/bin/ && \
+    rm -f nerdctl-bin.tar.gz containerd-rootless-setuptool.sh containerd-rootless.sh
+
+# Add kube-explorer
+ARG KUBE_EXPLORER_VERSION=v0.3.2
+RUN curl -o /usr/bin/kube-explorer -sfL https://github.com/cnrancher/kube-explorer/releases/download/${KUBE_EXPLORER_VERSION}/kube-explorer-linux-amd64 && \
+    chmod +x /usr/bin/kube-explorer
