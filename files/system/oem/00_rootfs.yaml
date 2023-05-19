@@ -26,3 +26,15 @@ stages:
         /var/lib/longhorn
         /var/lib/cni
       PERSISTENT_STATE_BIND: "true"
+  initramfs:
+  - if: '[ ! -f "/run/cos/recovery_mode" ]'
+    name: "Persist /etc/machine-id"
+    commands:
+    - |
+      # persist machine-id
+      if [ -s /usr/local/etc/machine-id ]; then
+        cat /usr/local/etc/machine-id > /etc/machine-id
+      else
+        mkdir -p /usr/local/etc
+        cp /etc/machine-id /usr/local/etc
+      fi
