@@ -55,41 +55,50 @@ stages:
    # Setup persistency so k3s works properly
    # See also: https://rancher.github.io/elemental-toolkit/docs/reference/immutable_rootfs/#configuration-with-an-environment-file
    rootfs.after:
-    - name: "Immutable Layout configuration"
-      environment_file: /run/cos/cos-layout.env
-      environment:
-        VOLUMES: "LABEL=COS_OEM:/oem LABEL=COS_PERSISTENT:/usr/local"
-        OVERLAY: "tmpfs:25%"
-        RW_PATHS: "/var /etc /srv"
-        PERSISTENT_STATE_PATHS: >-
-          /etc/systemd
-          /etc/rancher
-          /etc/ssh
-          /etc/iscsi
-          /etc/cni
-          /home
-          /opt
-          /root
-          /usr/libexec
-          /var/log
-          /var/lib/rancher
-          /var/lib/kubelet
-          /var/lib/NetworkManager
-          /var/lib/longhorn
-          /var/lib/cni
-        PERSISTENT_STATE_BIND: "true"
+     - name: "Immutable Layout configuration"
+       environment_file: /run/cos/cos-layout.env
+       environment:
+         VOLUMES: "LABEL=COS_OEM:/oem LABEL=COS_PERSISTENT:/usr/local"
+         OVERLAY: "tmpfs:25%"
+         RW_PATHS: "/var /etc /srv"
+         PERSISTENT_STATE_PATHS: >-
+           /etc/systemd
+           /etc/rancher
+           /etc/ssh
+           /etc/iscsi
+           /etc/cni
+           /home
+           /opt
+           /root
+           /usr/libexec
+           /var/log
+           /var/lib/rancher
+           /var/lib/kubelet
+           /var/lib/NetworkManager
+           /var/lib/longhorn
+           /var/lib/cni
+         PERSISTENT_STATE_BIND: "true"
    # Finally, let's start k3s when network is available
-   network:
+   network.before:
      - if: '[ $(blkid -L COS_STATE) ]'
        name: "Setup k3s"
-       # Setup environment file for custom k3s arguments
-       environment_file: "/etc/systemd/system/k3s.service.env"
-       environment:
-         CATTLE_NEW_SIGNED_CERT_EXPIRATION_DAYS: "3650"
-         K3S_KUBECONFIG_MODE: "644"
-       commands:
-       - |
-           chmod 600 /etc/systemd/system/k3s.service.env
+       files:
+       - path: /etc/default/k3s
+         content: |
+              CATTLE_NEW_SIGNED_CERT_EXPIRATION_DAYS=3650
+              K3S_KUBECONFIG_MODE=644
+         permissions: 0600
+         owner: 0
+         group: 0
+       - path: /etc/default/k3s-agent
+         content: |
+              CATTLE_NEW_SIGNED_CERT_EXPIRATION_DAYS=3650
+         permissions: 0600
+         owner: 0
+         group: 0
+   network:
+     - if: '[ $(blkid -L COS_STATE) ]'
+       name: "Start k3s"
        systemctl:
          start:
          - k3s
