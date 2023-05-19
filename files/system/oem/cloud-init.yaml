@@ -3,7 +3,7 @@ stages:
    initramfs:
      # Setup default hostname
      - name: "Branding"
-       hostname: "k3s-cos"
+       hostname: "k3cos"
      # Setup an admin group with sudo access
      - name: "Setup groups"
        ensure_entities:
