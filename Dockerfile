@@ -1,7 +1,9 @@
 FROM quay.io/costoolkit/releases-teal:luet-toolchain-0.33.0-2 AS luet
+
+# https://build.opensuse.org/package/show/isv:Rancher:Harvester:BaseOS53/baseos
 FROM registry.opensuse.org/isv/rancher/harvester/baseos53/main/baseos:latest AS base
 
-ARG K3S_VERSION=v1.26.4+k3s1
+ARG K3S_VERSION=v1.26.6+k3s1
 ARG ARCH=amd64
 ENV ARCH=${ARCH}
 
@@ -27,8 +29,8 @@ RUN luet install -y \
 # Install k3s server/agent
 ENV INSTALL_K3S_VERSION=${K3S_VERSION}
 RUN curl -sfL https://get.k3s.io > installer.sh && \
-    INSTALL_K3S_SKIP_START="true" INSTALL_K3S_SKIP_ENABLE="true" INSTALL_K3S_BIN_DIR="/usr/bin" sh installer.sh && \
-    INSTALL_K3S_SKIP_START="true" INSTALL_K3S_SKIP_ENABLE="true" INSTALL_K3S_BIN_DIR="/usr/bin" sh installer.sh agent && \
+    INSTALL_K3S_SKIP_START="true" INSTALL_K3S_SKIP_ENABLE="true" INSTALL_K3S_BIN_DIR="/usr/bin" INSTALL_K3S_SKIP_SELINUX_RPM="true" sh installer.sh && \
+    INSTALL_K3S_SKIP_START="true" INSTALL_K3S_SKIP_ENABLE="true" INSTALL_K3S_BIN_DIR="/usr/bin" INSTALL_K3S_SKIP_SELINUX_RPM="true" sh installer.sh agent && \
     mkdir -p /opt/k3s && \
     curl -sfL https://github.com/k3s-io/k3s/releases/download/${INSTALL_K3S_VERSION}/k3s-airgap-images-amd64.tar.zst > /opt/k3s/k3s-airgap-images-amd64.tar.zst && \
     rm -rf installer.sh
