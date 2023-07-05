@@ -19,6 +19,7 @@ stages:
         /opt
         /root
         /usr/libexec
+        /var/lib/wicked
         /var/log
         /var/lib/rancher
         /var/lib/kubelet
