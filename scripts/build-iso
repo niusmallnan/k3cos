@@ -8,5 +8,5 @@ docker build -t niusmallnan/k3cos:latest .
 
 docker run -it --rm -v $PWD:/build \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    quay.io/costoolkit/elemental-cli:v0.2.5 build-iso \
+    ghcr.io/rancher/elemental-toolkit/elemental-cli:v0.10.7 build-iso \
     --local --config-dir build/ -o build/dist/ niusmallnan/k3cos:latest

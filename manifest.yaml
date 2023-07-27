@@ -1,15 +1,7 @@
 iso:
-  uefi:
-    - channel:live/grub2-efi-image
-  image:
-    - channel:live/grub2
-    - channel:live/grub2-efi-image
-  label: "COS_LIVE"
+  bootloader-in-rootfs: true
+  grub-entry-name: "K3COS Installer"
 
-name: "k3cos-0"
+squash-no-compression: true
+name: "k3cos"
 date: true
-
-repositories:
-  - uri: quay.io/costoolkit/releases-teal
-    type: docker
-    reference: v0.10.6-repository.yaml

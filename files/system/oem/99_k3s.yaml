@@ -1,0 +1,7 @@
+name: "Elemental operator bootstrap"
+stages:
+  network.after:
+  - if: '[ $(blkid -L COS_STATE) ]'
+    name: "Start k3s"
+    commands:
+    - systemctl start k3s

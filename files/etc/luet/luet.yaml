@@ -5,13 +5,14 @@ general:
    debug: false
    spinner_charset: 9
 repositories:
-- name: "cos"
+- &cos
+  name: "cos"
   description: "cOS official"
   type: "docker"
-  enable: true
   cached: true
   priority: 1
+  arch: "amd64"
+  reference: repository.yaml
   verify: false
   urls:
     - "quay.io/costoolkit/releases-teal"
-  reference: "v0.10.6-repository.yaml"

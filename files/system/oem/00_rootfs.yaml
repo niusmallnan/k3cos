@@ -1,12 +1,24 @@
 name: "Rootfs Layout Settings"
 stages:
+  initramfs:
+  - if: '[ ! -f "/run/cos/recovery_mode" ]'
+    name: "Persist /etc/machine-id"
+    commands:
+    - |
+      # persist machine-id
+      if [ -s /usr/local/etc/machine-id ]; then
+        cat /usr/local/etc/machine-id > /etc/machine-id
+      else
+        mkdir -p /usr/local/etc
+        cp /etc/machine-id /usr/local/etc
+      fi
   # Setup persistency so k3s works properly
   # See also: https://rancher.github.io/elemental-toolkit/docs/reference/immutable_rootfs/#configuration-with-an-environment-file
   rootfs:
-  - name: "Immutable Layout configuration"
+  - if: '[ ! -f "/run/cos/recovery_mode" ]'
+    name: "Immutable Layout configuration"
     environment_file: /run/cos/cos-layout.env
     environment:
-      VOLUMES: "LABEL=COS_OEM:/oem LABEL=COS_PERSISTENT:/usr/local"
       OVERLAY: "tmpfs:25%"
       RW_PATHS: "/var /etc /srv"
       PERSISTENT_STATE_PATHS: >-
@@ -27,15 +39,9 @@ stages:
         /var/lib/longhorn
         /var/lib/cni
       PERSISTENT_STATE_BIND: "true"
-  initramfs:
-  - if: '[ ! -f "/run/cos/recovery_mode" ]'
-    name: "Persist /etc/machine-id"
-    commands:
-    - |
-      # persist machine-id
-      if [ -s /usr/local/etc/machine-id ]; then
-        cat /usr/local/etc/machine-id > /etc/machine-id
-      else
-        mkdir -p /usr/local/etc
-        cp /etc/machine-id /usr/local/etc
-      fi
+  - if: '[ -f "/run/cos/recovery_mode" ]'
+    # omit the persistent partition on recovery mode
+    name: "Layout configuration for recovery"
+    environment_file: /run/cos/cos-layout.env
+    environment:
+      OVERLAY: "tmpfs:25%"
